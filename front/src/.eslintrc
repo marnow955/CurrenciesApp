@@ -1,0 +1,5 @@
+'rules': {
+  ...
+  // allow callback literals
+  'standard/no-callback-literal': 0
+}
