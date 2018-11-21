@@ -1,6 +1,7 @@
 START TRANSACTION;
 
-INSERT INTO `CURRENCY` (`CURRENCY_CODE`, `CURRENCY_NAME`, `TYPE`) VALUES
+INSERT INTO `CURRENCY` (`CODE`, `NAME`, `TYPE`) VALUES
+('PLN', 'Polski złoty', 'fiat'),
 ('USD', 'Dolar amerykański', 'fiat'),
 ('GBP', 'Funt brytyjski', 'fiat'),
 ('BTC', 'Bitcoin', 'crypto'),

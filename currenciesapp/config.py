@@ -1,0 +1,5 @@
+class Config:
+    DEBUG = True
+    SECRET_KEY = '8A7AABFC9F16DC8F982FA9B073B4EAD0706D646'
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:@localhost/currenciesdb'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
