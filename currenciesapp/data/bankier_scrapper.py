@@ -3,13 +3,11 @@ from datetime import datetime
 from decimal import Decimal
 
 from selenium import webdriver
-from selenium.webdriver.chrome import service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select
 
 from currenciesapp import db, create_app
 from currenciesapp.data_models import Currency, CurrencyRates
-from currenciesapp.config import Config
 
 currency_list = ["CHF", "GBP", "EUR", "USD", "SEK", "DKK"]
 base_currency_code = "PLN"
@@ -70,7 +68,7 @@ def get_archive(currency_list=None, from_last_date=False):
     for currency_code in currency_list:
         currency = Currency.query.filter_by(code=currency_code).first()
         if from_last_date:
-            max_date = CurrencyRates.query.filter_by(currency=currency)\
+            max_date = CurrencyRates.query.filter_by(currency=currency) \
                 .order_by(CurrencyRates.date.desc()).first().date.date()
             data = get_data(browser, currency_code, max_date)
         else:
