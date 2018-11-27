@@ -82,7 +82,7 @@ def get_archive(currency_list=None, from_last_date=False):
                                  currency_code=currency.code, base_currency_code=base_currency_code)
             db.session.add(rate)
         db.session.commit()
-        break  # DEV - TO REMOVE
+        # break  # DEV - TO REMOVE
     browser.quit()
 
 

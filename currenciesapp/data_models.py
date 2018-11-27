@@ -35,9 +35,15 @@ class Report(db.Model):
     type = db.Column(db.String(30), nullable=False)
 
 
-class ReportCurrency(db.Model):
-    currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'), nullable=False)
-    report_id = db.Column(db.Integer, db.ForeignKey('report.id'), nullable=False)
+# class ReportCurrency(db.Model):
+#     currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'), nullable=False)
+#     report_id = db.Column(db.Integer, db.ForeignKey('report.id'), nullable=False)
+
+
+report_currency = db.Table('report_currency',
+                           db.Column('currency_code', db.String(4), db.ForeignKey('currency.code'), nullable=False),
+                           db.Column('report_id', db.Integer, db.ForeignKey('report.id'), nullable=False)
+                           )
 
 
 class Hparams(db.Model):
@@ -69,9 +75,15 @@ class Users(db.Model):
     last_name = db.Column(db.String(100), nullable=False)
 
 
-class Favourites(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'), nullable=False)
+# class Favourites(db.Model):
+#     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+#     currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'), nullable=False)
+
+
+favourites = db.Table('favourites',
+                      db.Column('user_id', db.Integer, db.ForeignKey('users.id'), nullable=False),
+                      db.Column('currency_code', db.String(4), db.ForeignKey('currency.code'), nullable=False)
+                      )
 
 
 class ExchangeOffices(db.Model):
@@ -80,14 +92,25 @@ class ExchangeOffices(db.Model):
     rank = db.Column(db.Integer)
 
 
-class Address(db.Model):
-    id = db.Column(db.Integer, db.ForeignKey('exchange_offices.id'), unique=True, nullable=False)
-    country = db.Column(db.String(150), nullable=False)
-    city = db.Column(db.String(150), nullable=False)
-    street = db.Column(db.String(150), nullable=False)
-    street_num = db.Column(db.Integer)
-    flat_num = db.Column(db.Integer)
-    postal_code = db.Column(db.String(10))
+# class Address(db.Model):
+#     id = db.Column(db.Integer, db.ForeignKey('exchange_offices.id'), unique=True, nullable=False)
+#     country = db.Column(db.String(150), nullable=False)
+#     city = db.Column(db.String(150), nullable=False)
+#     street = db.Column(db.String(150), nullable=False)
+#     street_num = db.Column(db.Integer)
+#     flat_num = db.Column(db.Integer)
+#     postal_code = db.Column(db.String(10))
+
+
+address = db.Table('address',
+                   db.Column('id', db.Integer, db.ForeignKey('exchange_offices.id'), unique=True, nullable=False),
+                   db.Column('country', db.String(150), nullable=False),
+                   db.Column('city', db.String(150), nullable=False),
+                   db.Column('street', db.String(150), nullable=False),
+                   db.Column('street_num', db.Integer),
+                   db.Column('flat_num', db.Integer),
+                   db.Column('postal_code', db.String(10)),
+                   )
 
 
 class UserComments(db.Model):
