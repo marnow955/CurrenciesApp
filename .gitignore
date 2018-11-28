@@ -2,3 +2,4 @@ env/*
 .idea/*
 __pycache__
 chromedriver_win32/*
+vue-jwt-authentication/node_modules/*
