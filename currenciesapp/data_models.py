@@ -73,17 +73,21 @@ class Users(db.Model):
     password = db.Column(db.String(250), nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
+    token = db.Column(db.String(600), nullable=True)
+    favourites = db.relationship('Favourites', backref='user', lazy=True,
+                                 primaryjoin="Users.id == Favourites.user_id")
 
 
-# class Favourites(db.Model):
-#     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-#     currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'), nullable=False)
+class Favourites(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    currency_code = db.Column(db.String(4), db.ForeignKey('currency.code'), nullable=False)
 
 
-favourites = db.Table('favourites',
-                      db.Column('user_id', db.Integer, db.ForeignKey('users.id'), nullable=False),
-                      db.Column('currency_code', db.String(4), db.ForeignKey('currency.code'), nullable=False)
-                      )
+# favourites = db.Table('favourites',
+#                       db.Column('user_id', db.Integer, db.ForeignKey('users.id'), nullable=False),
+#                       db.Column('currency_code', db.String(4), db.ForeignKey('currency.code'), nullable=False)
+#                       )
 
 
 class ExchangeOffices(db.Model):
