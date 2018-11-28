@@ -1,8 +1,10 @@
 from flask import Blueprint, request, abort, jsonify
 from flask_cors import cross_origin
+from datetime import datetime, timedelta
 
 from currenciesapp.data_models import Currency, CurrencyRates
 from currenciesapp.utils import validate_date
+from prediction.train import train_and_predict
 
 currencies = Blueprint('currencies', __name__)
 
@@ -82,6 +84,48 @@ def get_all_currency_rates():
 @currencies.route("/prediction", methods=['POST'])
 @cross_origin()
 def prediction():
-    rates_list = [{'date': '2018-06-03', 'price': '7720.2500 USD', 'change': 1.00},
-                  {'date': '2018-06-02', 'price': '7689.3410 USD', 'change': -0.67}]
+    json = request.get_json()
+    if not json:
+        abort(400)
+    if 'currencyCode' not in json or 'startDate' not in json or 'endDate' not in json:
+        abort(422)
+    predictions = []
+    rates = []
+    pchanges = []
+    start_date = datetime.strptime(json['startDate'], '%Y-%m-%d')
+    end_date = datetime.strptime(json['endDate'], '%Y-%m-%d')
+    currency = Currency.query.filter_by(code=json['currencyCode']).first()
+    rates = CurrencyRates.query.filter(CurrencyRates.currency == currency,
+                                       CurrencyRates.date.between(start_date, end_date)).order_by(
+                                            CurrencyRates.date.desc()).all()
+    train_predict, test_predict = train_and_predict(currency.code, start_date, end_date)
+    test_predict_list = test_predict.tolist()
+    test_predictions = [round(x, 4) for l in test_predict_list for x in l]
+    pchanges.append(0.00)
+    for i in range(1, len(test_predictions)):
+        pchanges.append(round((test_predictions[i] - test_predictions[i - 1]) * 100 / test_predictions[i - 1], 2))
+    test_predictions = test_predictions[::-1]
+    print(test_predictions)
+    day_count = (end_date - start_date).days + 1
+    for single_date in (end_date - timedelta(n) for n in range(day_count)):
+        i = (end_date - single_date).days
+        contains = False
+        for rate in rates:
+            print(rate.date.strftime("%Y-%m-%d") + " = " + single_date.strftime("%Y-%m-%d"))
+            if rate.date.strftime("%Y-%m-%d") == single_date.strftime("%Y-%m-%d"):
+                contains = True
+                break
+        if contains:
+            print(single_date.strftime("%Y-%m-%d") + " " + str(i))
+            predictions.append(test_predictions[i])
+    print(len(rates))
+    print(len(predictions))
+    pchanges = pchanges[::-1]
+    rates_list = []
+    for i in range(len(predictions)):
+        rates_list.append({
+            'date': rates[i].date.strftime('%Y-%m-%d'),
+            'price': str(predictions[i]) + ' ' + rates[i].base_currency_code,
+            'change': pchanges[i]
+        })
     return jsonify(rates=rates_list)

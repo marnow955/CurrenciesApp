@@ -3,8 +3,8 @@ import pandas as pd
 
 from sklearn.preprocessing import MinMaxScaler
 
-from currenciesapp.model import model
-from currenciesapp.models import Report
+from prediction import model
+from currenciesapp.data_models import CurrencyRates
 from currenciesapp import db, create_app
 
 
@@ -18,7 +18,7 @@ def create_dataset(dataset, look_back=1):
 
 
 def prepare_data(from_date, to_date, currency, split_ratio, look_back):
-    currency_data = db.session.query(Report).filter_by(currency_id=currency)
+    currency_data = db.session.query(CurrencyRates).filter_by(currency_code=currency)
     prices_df = pd.DataFrame([(data.price, data.date) for data in currency_data])
     prices_df = prices_df[(prices_df[1] < to_date)]
     dataset = prices_df[0].values.astype('float32')
@@ -52,4 +52,4 @@ def train_and_predict(currency, from_date, to_date, neurons=4,
 if __name__ == '__main__':
     app = create_app()
     with app.app_context():
-        print(train_and_predict(1, "2018-05-01", "2018-06-01"))
+        print(train_and_predict('BTC', "2018-05-01", "2018-06-01"))
