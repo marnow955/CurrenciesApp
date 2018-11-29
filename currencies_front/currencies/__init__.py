@@ -1,1 +1,1 @@
-from .views import currency
+from .views import currencies

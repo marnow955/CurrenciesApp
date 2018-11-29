@@ -21,5 +21,6 @@ def home():
     if date:
         data["date"] = date
     reports_data = requests.post(CURRENCIES_URL, json=data)
-    reports = reports_data.get_json()
-    return render_template('home.html', reports=reports["currencies"], type=type, selected_date=rep)
+    reports = reports_data.json()
+    print(reports)
+    return render_template('home.html', reports=reports["currencies"], type=type, selected_date=reports['date'])

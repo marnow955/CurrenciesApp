@@ -41,19 +41,14 @@
                         <td  style="vertical-align:middle">
                             <img class="rounded-circle article-img" style="height: 1.3em"
                                  src="{{ url_for('static',
-                                         filename='currencies_pics/' + report.currency.code + '_small.png') }}">
-                            <a href="{{ url_for('currencies.currency', currency_code=report.currency.code) }}">
-                                {{ report.currency.code }}
+                                         filename='currencies_pics/' + report.code + '_small.png') }}">
+                            <a href="{{ url_for('currencies.currency', currency_code=report.code) }}">
+                                {{ report.code }}
                             </a>
                         </td>
-                        <td>{{ report.currency.name }}</td>
+                        <td>{{ report.name }}</td>
                         <td>
                             {{ report.price }}
-                    {% if report.currency.type == 'fiat' %}
-                            PLN
-                    {% elif report.currency.type == 'crypto' %}
-                            USD
-                    {% endif %}
                         </td>
                     {% if report.change >= 0 %}
                         <td class="text-success">{{ report.change }}%</td>
@@ -110,6 +105,7 @@
             $("#date").datepicker().datepicker("setDate", new Date("{{ selected_date }}"));
 
             $('#table').DataTable({
+                "order": [[ 1, "asc"]],
                 "dom": ""
             });
         })
