@@ -1,1 +1,1 @@
-from .views import login
+from .views import login_blueprint

@@ -13,10 +13,10 @@ def create_app():
     from currencies_front.main import main
     from currencies_front.currencies import currencies
     from currencies_front.predictions import predictions
-    from currencies_front.login import login
+    from currencies_front.login import login_blueprint
     app.register_blueprint(main)
     app.register_blueprint(currencies)
     app.register_blueprint(predictions)
-    app.register_blueprint(login)
+    app.register_blueprint(login_blueprint)
     login = LoginManager(app)
     return app
