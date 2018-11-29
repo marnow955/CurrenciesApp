@@ -1,9 +1,11 @@
 import requests
-from currencies_front.front_run import CURRENCIES_URL, RATES_URL
+# from currencies_front.front_run import CURRENCIES_URL, RATES_URL
 from flask import Blueprint, render_template
 
 from currencies_front.currencies.forms import CurrencyForm
 
+API_URL = 'localhoost:5000/'
+CURRENCIES_URL = API_URL + 'get_currencies'
 
 currencies = Blueprint('currencies', __name__, url_prefix='/currency')
 

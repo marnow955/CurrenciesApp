@@ -1,19 +1,25 @@
 from flask import Blueprint, render_template, request
 from flask_cors import cross_origin
 from datetime import datetime
+import requests
 
-from currenciesapp.models import Report, Currency
+# from currencies_front.front_run import CURRENCIES_URL
 
 main = Blueprint('main', __name__)
 
+API_URL = 'http://localhost:5000/'
+
+CURRENCIES_URL = API_URL + 'get_currencies'
 
 @main.route("/")
 @main.route("/home")
 @cross_origin()
 def home():
     type = request.args.get('type', 'fiat', type=str)
-    start_date = Report.query.join(Currency).filter(Currency.type == type).order_by(Report.date.asc()).first().date.date()
-    end_date = Report.query.join(Currency).filter(Currency.type == type).order_by(Report.date.desc()).first().date.date()
-    date = request.args.get('date', end_date.strftime('%Y-%m-%d'), type=str)
-    reports = Report.query.join(Currency).filter(Currency.type == type).filter(Report.date == date).all()
-    return render_template('home.html', reports=reports, type=type, selected_date=date)
+    date = request.args.get('date', type=str)
+    data = {"type": type}
+    if date:
+        data["date"] = date
+    reports_data = requests.post(CURRENCIES_URL, json=data)
+    reports = reports_data.get_json()
+    return render_template('home.html', reports=reports["currencies"], type=type, selected_date=rep)
