@@ -1,5 +1,4 @@
 from flask import Flask, Blueprint, request, redirect, render_template, session, flash
-from flask_cors import cross_origin
 import requests
 
 login = Blueprint('login', __name__)
@@ -11,11 +10,10 @@ LOGIN_URL = API_URL + 'login'
 @login.route("/login", methods=['POST'])
 @cross_origin()
 def login():
-    username = request.form['username']
-    password = request.form['password']
-    data = {'username': username, 'passwors': password}
-    token = requests.post(LOGIN_URL, json=data)
-    if not token:
-        return redirect('/home')
-    else:
-        return redirect('/predictions')
+    form = LoginForm()
+    if form.validate_on_submit():
+        username = form['username']
+        password = form['password']
+        data = {'username': username, 'passwors': password}
+        token = requests.post(LOGIN_URL, json=data)
+    return render_template('login.html', title='Logowanie')
