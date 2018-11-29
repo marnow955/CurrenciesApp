@@ -1,0 +1,150 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    {{ super() }}
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="row jumbotron" style="padding: 2rem 1rem !important;">
+        <div class="col-md-4" style="padding-top: 15px; padding-left: 30px;">
+            <img class="rounded-circle article-img"
+                 src="{{ url_for('static', filename='currencies_pics/' + currency.code + '_medium.png') }}">
+            <h3 style="display: inline; vertical-align: middle">{{ currency.name }}</h3>
+            <h6 style="display: inline; vertical-align: top"> {{ currency.code }} </h6>
+        </div>
+        <div class="col-md-4">
+            <h3>
+                {{ last.price }}
+                {% if currency.type == 'fiat' %}
+                            PLN
+                {% elif currency.type == 'crypto' %}
+                            USD
+                {% endif %}
+                {% if last.change >= 0 %}
+                    <span class="text-success">( {{ last.change }}% )</span>
+                {% else %}
+                    <span class="text-danger">( {{ last.change }}% )</span>
+                {% endif %}
+            </h3>
+            <h6>{{ last.date.date() }}</h6>
+        </div>
+        <div class="col-md-4" style="padding-top: 15px; padding-left: 0 !important; padding-right: 25px !important;">
+            <a class="btn btn-outline-primary" style="width: 100%;"
+               href="{{ url_for('currencies.currency', currency_code=currency.code) }}" role="button">Wróć do waluty</a>
+        </div>
+    </div>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <div class="row" style="margin-left: 15px;">
+                <div id="daterange-container" class="input-daterange col-md-8 row">
+                    <div class="col-md-6">
+                        {% if form.start_date.errors %}
+                            {{ form.start_date(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.start_date.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.start_date(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if form.end_date.errors %}
+                            {{ form.end_date(class="form-control is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.end_date.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.end_date(class="form-control") }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    {{ form.submit(class="btn btn-info form-control") }}
+                </div>
+            </div>
+        </fieldset>
+    </form>
+
+    <table class="table table-borderless" cellspacing="0" id="table" data-order='[[ 0, "desc" ]]'>
+        <thead style="margin-top: 0;">
+        <tr>
+            <th scope="col">Data</th>
+            <th scope="col">Kurs</th>
+            <th scope="col">Zmiana</th>
+            <th scope="col">Kurs prognozowany</th>
+            <th scope="col">Zmiana prognozowana</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for report, prediction, pchange in reports_predictions %}
+            <tr>
+                <td>{{ report.date.date() }}</td>
+                <td>
+                    {{ report.price }}
+                {% if report.currency.type == 'fiat' %}
+                    PLN
+                {% elif report.currency.type == 'crypto' %}
+                    USD
+                {% endif %}
+                </td>
+                {% if report.change >= 0 %}
+                    <td class="text-success">{{ report.change }}%</td>
+                {% else %}
+                    <td class="text-danger">{{ report.change }}%</td>
+                {% endif %}
+                <td>
+                    {{ prediction }}
+                {% if report.currency.type == 'fiat' %}
+                    PLN
+                {% elif report.currency.type == 'crypto' %}
+                    USD
+                {% endif %}
+                </td>
+                {% if pchange >= 0 %}
+                    <td class="text-success">{{ pchange }}%</td>
+                {% else %}
+                    <td class="text-danger">{{ pchange }}%</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock content %}
+
+{% block scripts %}
+    {{ super() }}
+
+    <script>
+        $(document).ready(function () {
+
+            $('.input-daterange').datepicker.dates['pl'] = {
+                days: ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"],
+                daysShort: ["Niedz.", "Pon.", "Wt.", "Śr.", "Czw.", "Piąt.", "Sob."],
+                daysMin: ["Ndz.", "Pn.", "Wt.", "Śr.", "Czw.", "Pt.", "Sob."],
+                months: ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"],
+                monthsShort: ["Sty.", "Lut.", "Mar.", "Kwi.", "Maj", "Cze.", "Lip.", "Sie.", "Wrz.", "Paź.", "Lis.", "Gru."],
+                today: "Dzisiaj"
+            };
+
+            $('.input-daterange').datepicker({
+                todayBtn: 'linked',
+                format: "yyyy-mm-dd",
+                language: 'pl',
+                todayHighlight: true,
+                weekStart: 1,
+                autoclose: true,
+                container:'#daterange-container'
+            });
+        });
+    </script>
+
+{% endblock %}

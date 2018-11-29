@@ -1,0 +1,131 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    {{ super() }}
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker3.standalone.css" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/locales/bootstrap-datepicker.pl.min.js" crossorigin="anonymous"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.16/datatables.min.css" crossorigin="anonymous"/>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-8">
+
+            <ul class="nav nav-tabs">
+            {% if type == 'fiat' %}
+                <li class="nav-item"><a class="nav-link active" href="{{ url_for('main.home', type='fiat', date=selected_date) }}">Waluty</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.home', type='crypto', date=selected_date) }}">Kryptowaluty</a></li>
+            {% else %}
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.home', type='fiat', date=selected_date) }}">Waluty</a></li>
+                <li class="nav-item"><a class="nav-link active" href="{{ url_for('main.home', type='crypto', date=selected_date) }}">Kryptowaluty</a></li>
+            {% endif %}
+            </ul>
+
+            <table class="table table-borderless" cellspacing="0" id="table">
+                <thead style="margin-top: 0;">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Symbol</th>
+                        <th scope="col">Waluta</th>
+                        <th scope="col">Kurs</th>
+                        <th scope="col">Zmiana proc.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for report in reports %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td  style="vertical-align:middle">
+                            <img class="rounded-circle article-img" style="height: 1.3em"
+                                 src="{{ url_for('static',
+                                         filename='currencies_pics/' + report.currency.code + '_small.png') }}">
+                            <a href="{{ url_for('currencies.currency', currency_code=report.currency.code) }}">
+                                {{ report.currency.code }}
+                            </a>
+                        </td>
+                        <td>{{ report.currency.name }}</td>
+                        <td>
+                            {{ report.price }}
+                    {% if report.currency.type == 'fiat' %}
+                            PLN
+                    {% elif report.currency.type == 'crypto' %}
+                            USD
+                    {% endif %}
+                        </td>
+                    {% if report.change >= 0 %}
+                        <td class="text-success">{{ report.change }}%</td>
+                    {% else %}
+                        <td class="text-danger">{{ report.change }}%</td>
+                    {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+        <div class="col-md-4">
+          <div class="content-section">
+            <h5>Sprawdź dane historyczne</h5>
+              <!-- Form code begins -->
+              <form id="form" method="">
+                  <div class="form-group align-items-center"> <!-- Date input -->
+                      <div class="col" id="date"></div>
+                  </div>
+                  <div class="form-group"> <!-- Submit button -->
+                      <button class="btn btn-primary " name="submit" type="submit">Załaduj</button>
+                  </div>
+              </form>
+              <!-- Form code ends -->
+          </div>
+        </div>
+
+    </div>
+
+{% endblock content %}
+
+{% block scripts %}
+    {{ super() }}
+
+    <script>
+        $(document).ready(function () {
+            $('#date').datepicker.dates['pl'] = {
+                days: ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"],
+                daysShort: ["Niedz.", "Pon.", "Wt.", "Śr.", "Czw.", "Piąt.", "Sob."],
+                daysMin: ["Ndz.", "Pn.", "Wt.", "Śr.", "Czw.", "Pt.", "Sob."],
+                months: ["Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec", "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"],
+                monthsShort: ["Sty.", "Lut.", "Mar.", "Kwi.", "Maj", "Cze.", "Lip.", "Sie.", "Wrz.", "Paź.", "Lis.", "Gru."],
+                today: "Dzisiaj"
+            };
+            $('#date').datepicker({
+                format: 'mm/dd/yyyy',
+                language: 'pl',
+                todayHighlight: true,
+                weekStart: 1,
+                todayBtn:  'linked'
+            });
+            $("#date").datepicker().datepicker("setDate", new Date("{{ selected_date }}"));
+
+            $('#table').DataTable({
+                "dom": ""
+            });
+        })
+        $("#form").submit(function (eventObj) {
+            var date = $("#date").datepicker('getDate');
+            date.setDate(date.getDate() + 1);
+            $('<input />').attr('type', 'hidden')
+                .attr('name', "type")
+                .attr('value', "{{ type }}")
+                .appendTo('#form');
+            $('<input />').attr('type', 'hidden')
+                .attr('name', "date")
+                .attr('value', date.toISOString().slice(0,10))
+                .appendTo('#form');
+            return true;
+        });
+    </script>
+
+{% endblock %}
