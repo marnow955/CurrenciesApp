@@ -1,6 +1,6 @@
 from currencies_front import create_app
 
-API_URL = 'localhoost:5000/'
+API_URL = 'http://localhost:5000/'
 
 CURRENCIES_URL = API_URL + 'get_currencies'
 RATES_URL = API_URL + 'get_all_currency_rates'
