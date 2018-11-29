@@ -77,7 +77,7 @@ def get_all_currency_rates():
             'price': str(rate.price) + ' ' + rate.base_currency_code,
             'change': rate.change
         })
-    return jsonify(currency_name=currency.name, last_price=last_price, last_change=last_change, last_date=last_date,
+    return jsonify(currencyName=currency.name, lastPrice=last_price, lastChange=last_change, lastDate=last_date,
                    rates=rates_list)
 
 
@@ -87,17 +87,29 @@ def prediction():
     json = request.get_json()
     if not json:
         abort(400)
-    if 'currencyCode' not in json or 'startDate' not in json or 'endDate' not in json:
+    if 'currencyCode' not in json:
         abort(422)
     predictions = []
     rates = []
     pchanges = []
+    currency = Currency.query.filter_by(code=json['currencyCode']).first()
+
+    last_rate = CurrencyRates.query.join(Currency, Currency.code == CurrencyRates.currency_code) \
+        .filter(Currency.code == json['currencyCode']).order_by(CurrencyRates.date.desc()).first()
+    last_date = last_rate.date.strftime('%Y-%m-%d')
+    last_price = str(last_rate.price) + ' ' + last_rate.base_currency_code
+    last_change = last_rate.change
+
+    if 'startDate' not in json or 'endDate' not in json:
+        return jsonify(currencyName=currency.name, lastPrice=last_price, lastChange=last_change, lastDate=last_date,
+                       rates=[])
+
     start_date = datetime.strptime(json['startDate'], '%Y-%m-%d')
     end_date = datetime.strptime(json['endDate'], '%Y-%m-%d')
-    currency = Currency.query.filter_by(code=json['currencyCode']).first()
+
     rates = CurrencyRates.query.filter(CurrencyRates.currency == currency,
                                        CurrencyRates.date.between(start_date, end_date)).order_by(
-                                            CurrencyRates.date.desc()).all()
+        CurrencyRates.date.desc()).all()
     train_predict, test_predict = train_and_predict(currency.code, start_date, end_date)
     test_predict_list = test_predict.tolist()
     test_predictions = [round(x, 4) for l in test_predict_list for x in l]
@@ -105,7 +117,7 @@ def prediction():
     for i in range(1, len(test_predictions)):
         pchanges.append(round((test_predictions[i] - test_predictions[i - 1]) * 100 / test_predictions[i - 1], 2))
     test_predictions = test_predictions[::-1]
-    print(test_predictions)
+    # print(test_predictions)
     day_count = (end_date - start_date).days + 1
     for single_date in (end_date - timedelta(n) for n in range(day_count)):
         i = (end_date - single_date).days
@@ -116,7 +128,7 @@ def prediction():
                 contains = True
                 break
         if contains:
-            print(single_date.strftime("%Y-%m-%d") + " " + str(i))
+            # print(single_date.strftime("%Y-%m-%d") + " " + str(i))
             predictions.append(test_predictions[i])
     print(len(rates))
     print(len(predictions))
@@ -126,6 +138,9 @@ def prediction():
         rates_list.append({
             'date': rates[i].date.strftime('%Y-%m-%d'),
             'price': str(predictions[i]) + ' ' + rates[i].base_currency_code,
-            'change': pchanges[i]
+            'change': pchanges[i],
+            'realPrice': str(rates[i].price) + ' ' + rates[i].base_currency_code,
+            'realChange': rates[i].change
         })
-    return jsonify(rates=rates_list)
+    return jsonify(currencyName=currency.name, lastPrice=last_price, lastChange=last_change, lastDate=last_date,
+                   rates=rates_list)

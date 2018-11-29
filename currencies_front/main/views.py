@@ -11,6 +11,7 @@ API_URL = 'http://localhost:5000/'
 
 CURRENCIES_URL = API_URL + 'get_currencies'
 
+
 @main.route("/")
 @main.route("/home")
 @cross_origin()

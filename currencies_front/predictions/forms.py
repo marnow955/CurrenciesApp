@@ -7,4 +7,3 @@ class PredictionsForm(FlaskForm):
     start_date = DateField('Od', validators=[DataRequired()], render_kw={"placeholder": "Data od"})
     end_date = DateField('Do', validators=[DataRequired()], render_kw={"placeholder": "Data do"})
     submit = SubmitField('Predykcja')
-x

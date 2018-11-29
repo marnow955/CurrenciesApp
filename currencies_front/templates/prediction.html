@@ -10,29 +10,24 @@
     <div class="row jumbotron" style="padding: 2rem 1rem !important;">
         <div class="col-md-4" style="padding-top: 15px; padding-left: 30px;">
             <img class="rounded-circle article-img"
-                 src="{{ url_for('static', filename='currencies_pics/' + currency.code + '_medium.png') }}">
-            <h3 style="display: inline; vertical-align: middle">{{ currency.name }}</h3>
-            <h6 style="display: inline; vertical-align: top"> {{ currency.code }} </h6>
+                 src="{{ url_for('static', filename='currencies_pics/' + currency_code + '_medium.png') }}">
+            <h3 style="display: inline; vertical-align: middle">{{ currency_name }}</h3>
+            <h6 style="display: inline; vertical-align: top"> {{ currency_code }} </h6>
         </div>
         <div class="col-md-4">
             <h3>
-                {{ last.price }}
-                {% if currency.type == 'fiat' %}
-                            PLN
-                {% elif currency.type == 'crypto' %}
-                            USD
-                {% endif %}
-                {% if last.change >= 0 %}
-                    <span class="text-success">( {{ last.change }}% )</span>
+                {{ last_price }}
+                {% if last_change >= 0 %}
+                    <span class="text-success">( {{ last_change }}% )</span>
                 {% else %}
-                    <span class="text-danger">( {{ last.change }}% )</span>
+                    <span class="text-danger">( {{ last_change }}% )</span>
                 {% endif %}
             </h3>
-            <h6>{{ last.date.date() }}</h6>
+            <h6>{{ last_date }}</h6>
         </div>
         <div class="col-md-4" style="padding-top: 15px; padding-left: 0 !important; padding-right: 25px !important;">
             <a class="btn btn-outline-primary" style="width: 100%;"
-               href="{{ url_for('currencies.currency', currency_code=currency.code) }}" role="button">Wróć do waluty</a>
+               href="{{ url_for('currencies.currency', currency_code=currency_code) }}" role="button">Wróć do waluty</a>
         </div>
     </div>
 
@@ -84,34 +79,24 @@
         </tr>
         </thead>
         <tbody>
-        {% for report, prediction, pchange in reports_predictions %}
+        {% for report in reports_predictions %}
             <tr>
-                <td>{{ report.date.date() }}</td>
+                <td>{{ report.date }}</td>
+                <td>
+                    {{ report.realPrice }}
+                </td>
+                {% if report.realChange >= 0 %}
+                    <td class="text-success">{{ report.realChange }}%</td>
+                {% else %}
+                    <td class="text-danger">{{ report.realChange }}%</td>
+                {% endif %}
                 <td>
                     {{ report.price }}
-                {% if report.currency.type == 'fiat' %}
-                    PLN
-                {% elif report.currency.type == 'crypto' %}
-                    USD
-                {% endif %}
                 </td>
                 {% if report.change >= 0 %}
                     <td class="text-success">{{ report.change }}%</td>
                 {% else %}
                     <td class="text-danger">{{ report.change }}%</td>
-                {% endif %}
-                <td>
-                    {{ prediction }}
-                {% if report.currency.type == 'fiat' %}
-                    PLN
-                {% elif report.currency.type == 'crypto' %}
-                    USD
-                {% endif %}
-                </td>
-                {% if pchange >= 0 %}
-                    <td class="text-success">{{ pchange }}%</td>
-                {% else %}
-                    <td class="text-danger">{{ pchange }}%</td>
                 {% endif %}
             </tr>
         {% endfor %}
