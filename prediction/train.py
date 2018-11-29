@@ -34,8 +34,8 @@ def prepare_data(from_date, to_date, currency, split_ratio, look_back):
     return train_x, test_x, train_y, test_y, scaler, dataset
 
 
-def train_and_predict(currency, from_date, to_date, neurons=4,
-                      activ_func="linear", split_ratio=0.95, epochs=20,
+def train_and_predict(currency, from_date, to_date, neurons=2,
+                      activ_func="linear", split_ratio=0.95, epochs=5,
                       batch_size=2, look_back=5, optimizer="adam"):
 
     train_x, test_x, train_y, test_y, scaler, dataset = prepare_data(

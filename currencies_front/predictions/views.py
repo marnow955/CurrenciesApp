@@ -26,4 +26,3 @@ def prediction(currency_code):
     return render_template('prediction.html', title='Predykcja', form=form, reports_predictions=json['rates'],
                            currency_name=json['currencyName'], currency_code=currency_code,
                            last_price=json['lastPrice'], last_change=json['lastChange'], last_date=json['lastDate'])
-    return "OK"
