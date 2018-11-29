@@ -3,14 +3,14 @@ import requests
 
 from currencies_front.register.forms import RegistrationForm
 
-login_blueprint = Blueprint('login', __name__)
+register_blueprint = Blueprint('register', __name__)
 
 API_URL = 'http://localhost:5000/'
-LOGIN_URL = API_URL + 'user/register'
+REGISTER_URL = API_URL + 'user/register'
 
 
-@login_blueprint.route("/register", methods=['GET', 'POST'])
-def login():
+@register_blueprint.route("/register", methods=['GET', 'POST'])
+def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         username = form['username'].data
@@ -18,9 +18,9 @@ def login():
         first_name = form['first_name'].data
         last_name = form['last_name'].data
         email = form['email'].data
-        data = {'username': username, 'password': password, 'first_name': first_name, 'last_name': last_name,
+        data = {'username': username, 'password': password, 'firstName': first_name, 'lastName': last_name,
                 'email': email}
-        response = requests.post(LOGIN_URL, json=data)
+        response = requests.post(REGISTER_URL, json=data)
         json = response.json()
-        print(json['token'])
+        print(json)
     return render_template('register.html', title='Rejestracja', form=form)
